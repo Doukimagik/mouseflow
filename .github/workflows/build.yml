@@ -1,0 +1,33 @@
+name: Build MouseFlow.exe
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install pyautogui pillow pyinstaller
+
+      - name: Build exe with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed --name "MouseFlow" mouseflow.py
+
+      - name: Upload MouseFlow.exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: MouseFlow-Windows
+          path: dist/MouseFlow.exe
