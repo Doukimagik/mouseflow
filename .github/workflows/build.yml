@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: windows-latest
@@ -20,11 +23,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyautogui pillow pyinstaller
+          pip install pyautogui pillow pyinstaller pywin32
 
       - name: Build exe with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name "MouseFlow" mouseflow.py
+          pyinstaller --onefile --windowed --name "MouseFlow" --hidden-import pyautogui --hidden-import PIL --hidden-import pyscreeze mouseflow.py
 
       - name: Upload MouseFlow.exe
         uses: actions/upload-artifact@v4
