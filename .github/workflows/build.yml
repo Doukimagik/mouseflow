@@ -25,9 +25,19 @@ jobs:
         run: |
           pip install pyautogui pillow pyinstaller pywin32
 
+      - name: Generate icon
+        run: |
+          python generate_icon.py
+
       - name: Build exe with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name "MouseFlow" --hidden-import pyautogui --hidden-import PIL --hidden-import pyscreeze mouseflow.py
+          pyinstaller --onefile --windowed --name "MouseFlow" `
+            --icon="mouseflow.ico" `
+            --hidden-import pyautogui `
+            --hidden-import PIL `
+            --hidden-import pyscreeze `
+            --version-file version_info.txt `
+            mouseflow.py
 
       - name: Upload MouseFlow.exe
         uses: actions/upload-artifact@v4
