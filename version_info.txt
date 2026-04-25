@@ -1,0 +1,39 @@
+# UTF-8
+#
+# fichier d'infos de version Windows
+# PyInstaller l'integre dans le .exe
+# Ces informations s'affichent dans Proprietes > Details du .exe
+# et aident Windows SmartScreen a identifier l'application
+
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(4, 0, 0, 0),
+    prodvers=(4, 0, 0, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo(
+      [
+        StringTable(
+          u'040C04B0',
+          [
+            StringStruct(u'CompanyName',      u'MouseFlow'),
+            StringStruct(u'FileDescription',  u'MouseFlow - Automatisation avancee de la souris'),
+            StringStruct(u'FileVersion',      u'4.0.0.0'),
+            StringStruct(u'InternalName',     u'MouseFlow'),
+            StringStruct(u'LegalCopyright',   u'Copyright 2025 MouseFlow'),
+            StringStruct(u'OriginalFilename', u'MouseFlow.exe'),
+            StringStruct(u'ProductName',      u'MouseFlow'),
+            StringStruct(u'ProductVersion',   u'4.0.0.0'),
+          ]
+        )
+      ]
+    ),
+    VarFileInfo([VarStruct(u'Translation', [0x040C, 1200])])
+  ]
+)
