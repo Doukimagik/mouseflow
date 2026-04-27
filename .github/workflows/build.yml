@@ -22,24 +22,24 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: |
-          pip install pyautogui pillow pyinstaller pywin32
+        run: pip install pyautogui pillow pyinstaller pywin32 cairosvg
 
-      - name: Generate icon
-        run: |
-          python generate_icon.py
+      - name: Convert SVG to ICO
+        run: python convert_icon.py
 
-      - name: Build exe with PyInstaller
+      - name: Verify icon
         run: |
-          pyinstaller --onefile --windowed --name "MouseFlow" `
-            --icon="mouseflow.ico" `
-            --hidden-import pyautogui `
-            --hidden-import PIL `
-            --hidden-import pyscreeze `
-            --version-file version_info.txt `
-            mouseflow.py
+          if (Test-Path "mouseflow.ico") {
+            Write-Host "OK mouseflow.ico trouve - taille: $((Get-Item mouseflow.ico).length) bytes"
+          } else {
+            Write-Error "mouseflow.ico INTROUVABLE"
+            exit 1
+          }
 
-      - name: Upload MouseFlow.exe
+      - name: Build exe
+        run: pyinstaller --onefile --windowed --name "MouseFlow" --icon="mouseflow.ico" --hidden-import pyautogui --hidden-import PIL --hidden-import pyscreeze mouseflow.py
+
+      - name: Upload exe
         uses: actions/upload-artifact@v4
         with:
           name: MouseFlow-Windows
