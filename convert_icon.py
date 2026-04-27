@@ -1,39 +1,50 @@
 """
-convert_icon.py - Convertit file.svg en mouseflow.ico
-Utilise svglib + reportlab (pur Python, compatible Windows)
+convert_icon.py - Retire le fond et genere mouseflow.ico
 """
-from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPM
 from PIL import Image
-import io, os
+from collections import deque
+import os
 
-svg_file = "file.svg"
-
-if not os.path.exists(svg_file):
-    print(f"ERREUR: {svg_file} introuvable")
+# Trouve le PNG
+for f in ["Mouseflow_icon.png", "Mouseflow icon.png", "mouseflow_icon.png"]:
+    if os.path.exists(f):
+        src_file = f
+        break
+else:
+    print("ERREUR: PNG introuvable:", os.listdir("."))
     exit(1)
 
-print(f"Conversion de {svg_file}...")
-drawing = svg2rlg(svg_file)
-print(f"SVG: {drawing.width}x{drawing.height}")
+print(f"Chargement: {src_file}")
+src = Image.open(src_file).convert("RGBA")
+w, h = src.size
+pixels = src.load()
 
-sizes = [16, 24, 32, 48, 64, 128, 256]
-frames = []
+# Flood fill depuis les bords - retire fond gris ou blanc
+visited = [[False]*h for _ in range(w)]
+queue = deque()
+for x in range(w): queue.append((x,0)); queue.append((x,h-1))
+for y in range(h): queue.append((0,y)); queue.append((w-1,y))
 
-for s in sizes:
-    scale_x = s / drawing.width
-    scale_y = s / drawing.height
-    drawing.width = s
-    drawing.height = s
-    drawing.transform = (scale_x, 0, 0, scale_y, 0, 0)
-    buf = io.BytesIO()
-    renderPM.drawToFile(drawing, buf, fmt="PNG", dpi=96)
-    buf.seek(0)
-    frame = Image.open(buf).convert("RGBA").resize((s, s), Image.LANCZOS)
-    frames.append(frame)
-    print(f"  {s}x{s} OK")
+count = 0
+while queue:
+    x, y = queue.popleft()
+    if x<0 or x>=w or y<0 or y>=h or visited[x][y]: continue
+    visited[x][y] = True
+    r, g, b, a = pixels[x, y]
+    diff = max(abs(r-g), abs(g-b), abs(r-b))
+    brightness = (r+g+b)//3
+    if diff < 30 and brightness > 80:
+        pixels[x, y] = (0, 0, 0, 0)
+        count += 1
+        for dx,dy in [(-1,0),(1,0),(0,-1),(0,1)]:
+            nx,ny = x+dx,y+dy
+            if 0<=nx<w and 0<=ny<h and not visited[nx][ny]:
+                queue.append((nx,ny))
 
+print(f"Fond retire: {count} pixels")
+
+sizes = [16, 32, 48, 64, 96, 128, 256]
+frames = [src.resize((s,s), Image.LANCZOS) for s in sizes]
 frames[0].save("mouseflow.ico", format="ICO",
-               append_images=frames[1:],
-               sizes=[(s, s) for s in sizes])
-print(f"mouseflow.ico genere ({os.path.getsize('mouseflow.ico')} bytes)")
+               append_images=frames[1:], sizes=[(s,s) for s in sizes])
+print(f"mouseflow.ico: {os.path.getsize('mouseflow.ico')} bytes")
