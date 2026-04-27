@@ -22,7 +22,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install pyautogui pillow pyinstaller pywin32 cairosvg
+        run: pip install pyautogui pillow pyinstaller pywin32 svglib reportlab
 
       - name: Convert SVG to ICO
         run: python convert_icon.py
@@ -30,7 +30,7 @@ jobs:
       - name: Verify icon
         run: |
           if (Test-Path "mouseflow.ico") {
-            Write-Host "OK mouseflow.ico trouve - taille: $((Get-Item mouseflow.ico).length) bytes"
+            Write-Host "OK - mouseflow.ico trouve - $((Get-Item mouseflow.ico).length) bytes"
           } else {
             Write-Error "mouseflow.ico INTROUVABLE"
             exit 1
